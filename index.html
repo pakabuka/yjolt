@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yale Journal of Law and Technology Publication Process</title>
+    <style>
+        :root {
+            /* Yale Official Identity Colors */
+            --yale-blue: #00356b;
+            --yale-blue-light: #eef3f8;
+            --yale-blue-hover: #002855;
+            --text-main: #222222;
+            --text-muted: #4a4a4a;
+            --bg-color: #fcfcfc;
+            --card-bg: #ffffff;
+            --line-color: #a0aab4;
+            
+            /* High-End Academic Status Colors */
+            --success: #1e5631; 
+            --success-light: #f1f8f3;
+            --danger: #8a1c1c;
+            --danger-light: #fdf2f2;
+        }
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 3rem 1rem;
+            line-height: 1.6;
+        }
+        /* Serif Typography for Academic Prestige */
+        h1, h2, h3, h4, .phase-divider {
+            font-family: "Georgia", "Times New Roman", serif;
+            font-weight: normal;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 4rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 2rem;
+        }
+        .header h4 {
+            font-family: "Helvetica Neue", Helvetica, sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--yale-blue);
+            margin: 0 0 0.5rem 0;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .header h1 {
+            color: #000;
+            margin-bottom: 0.75rem;
+            font-size: 2.5rem;
+        }
+        .header p {
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+            font-style: italic;
+            font-family: "Georgia", serif;
+        }
+        /* Flowchart Container */
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+        }
+        /* Phase Dividers */
+        .phase-divider {
+            background: #fff;
+            color: var(--yale-blue);
+            padding: 0.6rem 2.5rem;
+            border: 1.5px solid var(--yale-blue);
+            font-size: 1rem;
+            margin: 3rem 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            z-index: 2;
+            box-shadow: 2px 2px 0px var(--yale-blue);
+        }
+        /* Node Rows */
+        .row {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin: 0;
+        }
+        /* Roles (Left Side Labels) */
+        .role-container {
+            position: absolute;
+            right: 50%;
+            margin-right: 270px; 
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 240px; 
+            text-align: right;
+        }
+        .role-badge {
+            font-family: "Helvetica Neue", Helvetica, sans-serif;
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 4px 10px;
+            border-radius: 2px;
+            display: inline-block;
+            align-self: flex-end; 
+            border: 1px solid transparent;
+        }
+        /* Distinct Color Palette for Each Role */
+        .role-editor-in-chief { background: #00356b; color: #ffffff; } 
+        .role-executive-editor { background: #2a5b84; color: #ffffff; } 
+        .role-managing-editor { background: #bd5319; color: #ffffff; } 
+        .role-submission-editor { background: #5b6c5d; color: #ffffff; } 
+        .role-article-editor { background: #5c4d7d; color: #ffffff; } 
+        .role-first-year-editor { background: #8c7732; color: #ffffff; } 
+        .role-author { background: #ffffff; color: #333333; border-color: #a0aab4; } 
+        /* The Main Path Nodes */
+        .node {
+            width: 480px;
+            background: var(--card-bg);
+            border: 1px solid #ccc;
+            border-left: 6px solid var(--yale-blue);
+            padding: 1.5rem;
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .node:hover {
+            border-color: var(--yale-blue);
+            box-shadow: 5px 5px 15px rgba(0, 53, 107, 0.1);
+        }
+        .node-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .node h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            color: var(--yale-blue);
+        }
+        .node p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+        .expand-icon {
+            color: var(--yale-blue);
+            font-size: 1.8rem;
+            line-height: 1;
+            transition: transform 0.3s;
+        }
+        .node.expanded .expand-icon {
+            transform: rotate(45deg);
+        }
+        /* Expandable Details */
+        .details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, margin-top 0.3s ease;
+            background: var(--yale-blue-light);
+            border-top: 1px solid #d0dae5;
+            padding: 0 1.5rem;
+        }
+        .node.expanded .details {
+            max-height: 500px;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+        }
+        .details ul {
+            margin: 0;
+            padding-left: 1.2rem;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+        .details li {
+            margin-bottom: 0.6rem;
+        }
+        /* Interactive Link Styling */
+        .details a {
+            color: var(--yale-blue);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            font-weight: 600;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+        .details a:hover {
+            color: var(--yale-blue-hover);
+            background: #ffffff;
+        }
+        /* Vertical Flow Lines */
+        .v-line {
+            width: 1px;
+            height: 45px;
+            background-color: var(--line-color);
+            position: relative;
+        }
+        .v-line::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: -5px;
+            border-width: 7px 5px 0 5px;
+            border-style: solid;
+            border-color: var(--line-color) transparent transparent transparent;
+        }
+        /* Successful Conclusion */
+        .node-success {
+            border-left-color: var(--success);
+        }
+        
+        .node-success h3 {
+            color: var(--success);
+        }
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #ffffff;
+            width: 85%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 3rem;
+            border-top: 8px solid var(--yale-blue);
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            font-family: "Georgia", serif;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            font-size: 2.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+            font-family: "Helvetica Neue", sans-serif;
+            transition: color 0.2s;
+        }
+        .modal-close:hover {
+            color: var(--danger);
+        }
+        .modal-content h2 {
+            color: var(--yale-blue);
+            border-bottom: 2px solid var(--yale-blue-light);
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
+            font-family: "Georgia", serif;
+        }
+        .modal-content h3 {
+            color: var(--text-main);
+            margin-top: 1.5rem;
+            font-family: "Georgia", serif;
+        }
+        .modal-content p, .modal-content li {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+        .modal-content img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            margin: 1.5rem 0;
+            display: block;
+        }
+        /* Mobile Adjustments */
+        @media (max-width: 950px) {
+            .node { width: 95%; }
+            .role-container {
+                position: relative;
+                right: auto;
+                margin-right: 0;
+                top: auto;
+                transform: none;
+                flex-direction: row;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                width: 95%;
+                margin-bottom: 10px;
+            }
+            .role-badge { align-self: center; text-align: left; }
+            .row { flex-direction: column; align-items: center; }
+            .modal-content { width: 95%; padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h4>Yale Journal of Law and Technology</h4>
+        <h1>The Publication Lifecycle</h1>
+        <p>A comprehensive interactive guide to the editorial workflow.</p>
+    </div>
+    <div class="flowchart">
+        
+        <div class="phase-divider">Phase One: Initial Screening and Selection</div>
+        <div class="row">
+            <div class="role-container">
+                <span class="role-badge role-editor-in-chief">Editor in Chief</span>
+                <span class="role-badge role-executive-editor">Executive Editors</span>
+                <span class="role-badge role-managing-editor">Managing Editor</span>
+            </div>
+            <div class="node">
+                <div class="node-header">
+                    <h3>1. Initial Screening</h3>
+                    <span class="expand-icon">+</span>
+                </div>
+                <p>Papers are vetted by senior leadership for core novelty.</p>
+                <div class="details">
+                    <ul>
+                        <li>Volume: Approximately forty articles per week.</li>
+                        <li>High-novelty papers proceed to the secondary review stage.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="v-line"></div>
+        <div class="row">
+            <div class="role-container">
+                <span class="role-badge role-submission-editor">Submission Editors</span>
+            </div>
+            <div class="node">
+                <div class="node-header">
+                    <h3>2. Submission Editor Review</h3>
+                    <span class="expand-icon">+</span>
+                </div>
+                <p>Detailed secondary review process conducted weekly.</p>
+                <div class="details">
+                    <ul>
+                        <li><a onclick="openModal(event, 'reviewModal')">Submission editors read the article and conduct the review</a></li>
+                        <li>Articles rated four or five are returned for a full board review.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="v-line"></div>
+        <div class="row">
+            <div class="role-container">
+                <span class="role-badge role-editor-in-chief">Editor in Chief</span>
+                <span class="role-badge role-executive-editor">Executive Editors</span>
+                <span class="role-badge role-managing-editor">Managing Editor</span>
+            </div>
+            <div class="node">
+                <div class="node-header">
+                    <h3>3. Final Selection Review</h3>
+                    <span class="expand-icon">+</span>
+                </div>
+                <p>In-depth third review to determine offer eligibility.</p>
+                <div class="details">
+                    <ul>
+                        <li>Only articles receiving a perfect five proceed to preemption checks.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="phase-divider">Phase Two: Preemption and Offer</div>
+        <div class="row">
+            <div class="role-container">
+                <span class="role-badge role-article-editor">Article Editor</span>
+                <span class="role-badge role-editor-in-chief">Editor in Chief</span>
+                <span class="role-badge role-executive-editor">Executive Editors</span>
+                <span class="role-badge role-managing-editor">Managing Editor</span>
+            </div>
+            <div class="node">
+                <div class="node-header">
+                    <h3>4. Preemption and Formal Offer</h3>
+                    <span class="expand-icon">+</span>
+                </div>
+                <p>Verification of originality and issuance of the formal offer.</p>
+                <div class="details">
+                    <ul>
+                        <li><a onclick="openModal(event, 'preemptionGuideModal')">Article Editor conducts preemption checks</a> (Timeline: One Week).
+                            <ul>
+                                <li><a onclick="openModal(event, 'preemptionMemoModal')">Preemption Check Memo Sample</a></li>
+                            </ul>
+                        </li>
+                        <li>Senior board reviews findings and executes the formal offer.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="v-line"></div>
+        <div class="row">
+            <div class="role-container">
+                <span class="role-badge role-author">Author</span>
+            </div>
+            <div class="node">
+                <div class="node-header">
+                    <h3>5. Author Acceptance</h3>
+                    <span class="expand-icon">+</span>
+                </div>
+                <p>Seven-day window for the author to respond to the offer.</p>
+                <div class="details">
+                    <ul>
+                        <li>Once accepted, the article officially enters the Editing Lifecycle.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="phase-divider">Phase Three: The Editing Process</div>
+        <div class="row">
+            <div class="role-container">
+                <span class="role-badge role-article-editor">Article Editor</span>
+                <span class="role-badge role-executive-editor">Executive Editor</span>
+            </div>
+            <div class="node">
+                <div class="node-header">
+                    <h3>6. Introduction and Solicitation</h3>
+                    <span class="expand-icon">+</span>
+                </div>
+                <p>Initial coordination to secure the author's latest draft.</p>
+                <div class="details">
+                    <ul>
+                        <li><a onclick="openModal(event, 'leadEditingModal')">Introduction email sent to the author</a></li>
+                        <li>Solicit Draft One to begin formal editing.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="v-line"></div>
+        <div class="row">
+            <div class="role-container">
+                <span class="role-badge role-article-editor">Article Editor</span>
+                <span class="role-badge role-executive-editor">Executive Editor</span>
+                <span class="role-badge role-author">Author</span>
+            </div>
+            <div class="node">
+                <div class="node-header">
+                    <h3>7. First Edit Cycle</h3>
+                    <span class="expand-icon">+</span>
+                </div>
+                <p>Generation of the initial edit letter and structural review.</p>
+                <div class="details">
+                    <ul>
+                        <li><a onclick="openModal(event, 'guideModal')">Article Editor drafts first edit letter</a> (Two Weeks).
+                            <ul>
+                                <li><a onclick="openModal(event, 'sampleLettersModal')">Sample Edit Letters</a></li>
+                            </ul>
+                        </li>
+                        <li>Executive Editor review (One Week).</li>
+                        <li>Author revisions (Two Weeks).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="v-line"></div>
+        <div class="row">
+            <div class="role-container">
+                <span class="role-badge role-article-editor">Article Editor</span>
+                <span class="role-badge role-executive-editor">Executive Editor</span>
+                <span class="role-badge role-author">Author</span>
+            </div>
+            <div class="node">
+                <div class="node-header">
+                    <h3>8. Second Edit Cycle and Line Edits</h3>
+                    <span class="expand-icon">+</span>
+                </div>
+                <p>Addressing fine-grained structural issues and line-level prose.</p>
+                <div class="details">
+                    <ul>
+                        <li>Article Editor drafts second edit letter and first line edit (Two Weeks).</li>
+                        <li>Executive Editor review (One Week).</li>
+                        <li>Author returns Draft Three (Two Weeks).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="v-line"></div>
+        <div class="row">
+            <div class="role-container">
+                <span class="role-badge role-first-year-editor">First-Year Editors</span>
+                <span class="role-badge role-article-editor">Article Editor</span>
+                <span class="role-badge role-executive-editor">Executive Editor</span>
+            </div>
+            <div class="node">
+                <div class="node-header">
+                    <h3>9. Sourcecite and Final Line Edits</h3>
+                    <span class="expand-icon">+</span>
+                </div>
+                <p>Citation verification and final polish of the manuscript.</p>
+                <div class="details">
+                    <ul>
+                        <li>First-Year Editors perform Sourcecite on Draft Three.</li>
+                        <li>Article Editor incorporates into second line edit (One Week).</li>
+                        <li>Executive Editor final review (One Week).</li>
+                        <li>Author returns Draft Four (Two Weeks).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="phase-divider">Phase Four: Final Review and Publication</div>
+        <div class="row">
+            <div class="role-container">
+                <span class="role-badge role-executive-editor">Executive Editor</span>
+                <span class="role-badge role-editor-in-chief">Editor in Chief</span>
+            </div>
+            <div class="node">
+                <div class="node-header">
+                    <h3>10. Final Formatting Review</h3>
+                    <span class="expand-icon">+</span>
+                </div>
+                <p>Preparation of the final Draft Five for author approval.</p>
+                <div class="details">
+                    <ul>
+                        <li>Editor in Chief review and formatting (One Week).</li>
+                        <li>Formatted article returned to author.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="v-line"></div>
+        <div class="row">
+            <div class="role-container">
+                <span class="role-badge role-author">Author</span>
+                <span class="role-badge role-editor-in-chief">Editor in Chief</span>
+            </div>
+            <div class="node node-success">
+                <div class="node-header">
+                    <h3>11. Publication</h3>
+                    <span class="expand-icon">+</span>
+                </div>
+                <p>The manuscript is finalized and released publicly.</p>
+                <div class="details">
+                    <ul>
+                        <li>Author confirmation of Draft Five.</li>
+                        <li>Official Publication by the Editor in Chief.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="reviewModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('reviewModal')">&times;</span>
+            <h1 style="color: var(--yale-blue); margin-top: 0;">Guide to Reviewing Submissions</h1>
+            
+            <h2>I. How Do I Evaluate Articles?</h2>
+            <p>After reading each article, you should rate the article from one to five stars and make comments about whether and how the article meets or does not meet our evaluation criteria as explained in the sections below.</p>
+            <p>Your comments need not be a comprehensive overview of how the article stands with respect to each of our criteria. Rather, you should highlight the overall quality of the article and aspects of it that are most relevant to your rating. As a simplified example, you might want to comment that an article is decent, but you do not recommend publishing it because, despite its interesting topic, the article lacks analytical depth as it only raises a number of interesting (but not groundbreaking) questions without resolving them. Do try to be specific and briefly cite substantive aspects of the article if possible when making your comments, especially when related to its persuasiveness (one of the four evaluation criteria listed below).</p>
+            <p>You should read the entire article to evaluate it properly. Often reading the abstract and table of contents of an article gives you a rough sense of how good it is and where the article might be lacking. Spend your time wisely and drill down deeper in places that you think are important for your evaluation (for example to verify whether a seemingly interesting argument is adequately supported or whether certain claims are really novel).</p>
+            <h2>II. Criteria for Evaluating Articles</h2>
+            <p>Articles that we publish should generally meet the following criteria after edits:</p>
+            <ol>
+                <li><strong>Appropriateness:</strong> The article is timely and fits the Yale Journal of Law and Technology subject matter (that is, technology law and policy broadly defined).</li>
+                <li><strong>Novelty and Significance:</strong> The article adds something new and important to the state of scholarship on the subject. Most articles include a section in the introduction in which the author claims to be making a significant contribution to a particular legal field. It is up to you to determine whether this contribution is novel and significant. If you find yourself asking “so what?” after reading the article, it is probably not very significant. Sometimes you might need to do some light research about whether existing articles have already made similar arguments—Google Scholar can be a good place to start for that.</li>
+                <li><strong>Persuasiveness:</strong> The article fleshes out the claims the author makes in the introduction and contains well-reasoned analysis supported by adequate evidence. This is often the most important criterion as it often does not take long to determine whether an article makes a novel tech law argument, whereas the substantive arguments are harder to verify and thus warrant more careful attention.</li>
+                <li><strong>Accessibility:</strong> The article is comprehensible to law students and lawyers who are not experts in the area. In addition, the article is structured and organized in a way that is logical and clear.</li>
+            </ol>
+            <h2>III. What Do the Different Ratings Mean?</h2>
+            <h3>A. Five stars (Strongly Agree)</h3>
+            <p>We should absolutely publish this article. It sheds significant light on an important subject of tech legal scholarship and contains well-reasoned, in-depth, and generally clear analysis supported by strong evidence. The article might need some edits for clearer organization and stronger responses to certain significant although not essential counterarguments, but the core idea looks very promising.</p>
+            <h3>B. Four stars (Agree)</h3>
+            <p>The article is quite promising and should turn out great after edits. It makes an important contribution to the current tech legal scholarship and contains generally well-reasoned expert analysis supported by adequate evidence. The article could be clearer at times and may need to address a few important criticisms, but the overall thesis is sound.</p>
+            <h3>C. Two to three stars (Disagree to Neutral)</h3>
+            <p>The article makes an interesting argument about tech law, but the thesis is not very well supported, and its reasoning may contain one or more fatal flaws; or else its focus is not really on tech law, despite touching on some interesting aspects of technology. Even significant structural and substantive edits are unlikely to improve the article enough for it to meet our publication standards.</p>
+            <h3>D. One star (Strongly Disagree)</h3>
+            <p>The article has little to do with tech law, states an obvious claim, or is poorly reasoned. Even the Yale Journal of Law and Technology's dedicated and hardworking editors cannot save it.</p>
+            <h2>IV. Additional Considerations</h2>
+            <p>Note that the article does not need to be in a polished, final state yet. The Yale Journal of Law and Technology will have three to four rounds of edits for each piece, so you can give less weight to the writing style of the piece at this submission stage. The important thing is that some of the substantive ideas are promising such that the article will turn out great after edits.</p>
+            <p>You can also look at past articles as a benchmark. Thank you for reading this memo and for your hard work reviewing articles!</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="leadEditingModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('leadEditingModal')">&times;</span>
+            <h1 style="color: var(--yale-blue); margin-top: 0;">Guide to Lead Editing</h1>
+            
+            <p>Thank you for dedicating your time and effort to strengthening our pieces and shepherding them from acceptance to publication.</p>
+            <p>Article Editors perform a critical role in the editing process by taking responsibility for fostering the development of content through multiple rounds of edits. Each Article Editor will lead edit at least one piece per semester. This Guide is meant to provide you with template communications to make the editing process easier to navigate. The big picture: you will be responsible for your piece from start to finish. We expect that you will exercise care at every stage of the editing process.</p>
+            <p>Unless instructed otherwise, you should conduct all communications with your authors within Scholastica. Please ensure that your assigned Executive Editor and the Editor in Chief are included or copied on all messages.</p>
+            <p>Thank you again for your hard work. If you have any questions about these guidelines or about our editing and production processes more generally, please contact the Editor in Chief, the Managing Editors, and your Executive Editor.</p>
+            
+            <h2>I. Timeline</h2>
+            <p>In general, the editing schedule will run on the below timeline.</p>
+            <ul>
+                <li>Article Editors will have two weeks to draft first edit letter for Author</li>
+                <li>Executive Editors will have one week to provide comments</li>
+                <li>Author will have two weeks to incorporate feedback from first edit letter into new draft</li>
+                <li>Article Editor will have two weeks from receipt of revised draft to draft second edit letter and line edit</li>
+                <li>Executive Editors will have one week to provide comments</li>
+                <li>Author will have two weeks incorporate feedback from second edit letter into new draft</li>
+                <li>Managing Editors will schedule sourcecite upon receipt of revised draft</li>
+                <li>Article Editor will review sourcecite comments and send cleaned up draft to Author</li>
+                <li>Author will have one week to incorporate feedback from sourcecite</li>
+            </ul>
+            <h2>II. General Logistics</h2>
+            <h3>A. Track Your Changes</h3>
+            <p>When line editing, make all of your edits to the piece with “Track Changes” turned on. Do not “accept” tracked changes to a draft that have been entered by editors, either during sourcecites or the line-editing process. Authors need to be able to see—and approve or reject—every change we make to their piece.</p>
+            <h3>B. Format Your Comments</h3>
+            <p>When line editing, all comments should begin with “Author:” to indicate that they are intended for the author. If you are unsure of any of your suggestions or have any questions you would like to chat with your assigned Executive Editor about, then you can leave a comment that begins with “Executive Editor:” for them.</p>
+            <p>The Guide for Drafting Edit Letters provides examples of such comments. While reviewing those examples, note that the tone is professional and deferential: You should always use complete sentences for your comments. And you should generally open with phrases such as “Consider,” “We recommend,” and “Please.” If you have a question for the author, you should ask that in a comment as well.</p>
+            <h3>C. Communication with Authors</h3>
+            <p>A major component of the Article Editor role is extensively communicating with authors. As a result, it is important that Article Editors adhere to the protocols for author communications throughout the editing process.</p>
+            <p>Ultimately, no set of protocols can substitute for good judgment and common sense. But we hope you will find these guidelines helpful for avoiding some mistakes from past volumes as you take on your Article Editor duties.</p>
+            <ul>
+                <li>Email is the default form of communication with authors. All emails should be sent through the Discussion tab in Scholastica.
+                    <ul>
+                        <li>Unfortunately, Scholastica does not currently allow you to message more than one author in the Discussion tab. This means that if your assigned article has multiple authors, you will only be able to communicate with the submitting author on the platform. Often, authors have no problem with this arrangement, and they are happy to have one author handle all communications. However, if more than one of your authors would like to be reached out to directly, you can use a workaround to do so.</li>
+                        <li>Whenever a message is sent on Scholastica, the participants receive an email copy of the message. This email contains a conversation address in the “Reply-To:” line. If you would like to email multiple authors directly (that is, outside of the Scholastica Discussions tab), you can draft and send an email as normal while including the conversation address from the Reply-To line in the copy line of your email. Doing so will route a copy of your email to the Scholastica platform for our records. Importantly, this workaround assumes that you have already sent the initial “Congratulations and Next Steps” email from Section III.A below through the Discussion tab, as that will generate the conversation address you will use going forward.</li>
+                    </ul>
+                </li>
+                <li>There should be no email communications with an author that does not copy the Editor in Chief and Executive Editor.</li>
+                <li>All communication with authors must be professional, polished, and error-free. Emails should be proofread.</li>
+                <li>Address authors who are professors as “Professor Last Name,” rather than by their first name, in all communications (however, if a professor specifically asks to be addressed by their first name, we should comply with that request). Authors who are not professors should be referred to by the appropriate honorific. (This does not apply to student-authored pieces.)</li>
+                <li>All documents sent to authors should be saved in PDF form, with the exception of drafts and line edits.</li>
+                <li>All communications between the author and the Article Editor are strictly confidential, and the substance of those communications should only be shared with members involved in the production of the piece (for example, the Editor in Chief, Managing Editors, and Executive Editor). Article Editors should act in a way that respects the work of our authors and the trust that they place in us during the publication process.</li>
+                <li>If you are ever unsure about what you are allowed to tell an author or who should be included on correspondence with an author, ask the Editor in Chief or Executive Editor. We are reachable by email at most hours of the day. No question is too simple to ask, even if you have asked it before but have forgotten the answer.</li>
+                <li>The only substantive feedback an Article Editor should provide to an author about their piece should be in the form of feedback on proposals and official line edits. We do not provide outlines or previews of edits to authors, in either verbal or written form.</li>
+                <li>All communications about the substance of a piece must be approved by the Editor in Chief and Executive Editor. An Article Editor should never give substantive comments to an author that have not been approved through this process.
+                    <ul>
+                        <li>If you find an author particularly difficult to work with or you feel subject to a hostile working relationship with an author, contact the Editor in Chief or Executive Editor immediately.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h2>III. Email Templates</h2>
+            <p>In general, all of the below emails will be in one Scholastica Discussion thread. These templates have been added to Scholastica, but we have included them here for your reference should you ever need to message off of the platform (for example, multiple authors). However, please make note of the subject line even when using the Scholastica templates since the subject line does not auto-populate.</p>
+            <h3>A. First Edit Letter Outreach:</h3>
+            <p><strong>Subject Line:</strong> [ACTION REQUESTED] Yale Journal of Law and Technology Acceptance: Congratulations and Next Steps</p>
+            <p>Dear [Title Last Name],</p>
+            <p>Congratulations again on the acceptance of [Title]. I will be your lead editor, and I am thrilled to have the chance to work with you on your article. I have attached our first edit letter for your review.</p>
+            <p>We ask that you please read our proposed suggestions and try to incorporate them into a revised draft by [two weeks from date of message – format: “Day, Month Date”]. After receiving your revised draft, we will follow up with a second edit letter focusing on more granular edits as well as a line edit.</p>
+            <p>I am happy to touch base in any capacity between now and then as you work through the editing process.</p>
+            <p>Best,<br>[Name]</p>
+            <h3>B. Heads-Up Email to Author – Sent After Article Editor Sends Executive Editor Second Edit Letter for Review</h3>
+            <p>Dear [Title Last Name],</p>
+            <p>I hope you are doing well! This email is to remind you of upcoming dates for your article. A week from today, [Month Date], we will send you your second edit letter and line edit.</p>
+            <p>Your next draft will then be due back to us two weeks later on [Day], [Month Date]. As always, please be in touch if you have any questions or concerns.</p>
+            <p>Best,<br>[Name]</p>
+            <h3>C. Second Edit Letter and First Line Edit</h3>
+            <p>Dear [Title Last Name],</p>
+            <p>Please find attached (1) our second edit letter; (2) a redline edit, which includes a draft of your article with tracked changes and substantive comments; and (3) a clean version of the line edit, with the tracked changes accepted, and only substantive comments remaining.</p>
+            <p>A quick reminder that the revised draft of your article is due on [Day], [Month Date]. Following receipt of the article, the team will schedule a sourcecite date.</p>
+            <p>I am happy to touch base in any capacity between now and then as you work through the editing process.</p>
+            <p>Best,<br>[Name]</p>
+            <h3>D. Sourcecite Follow-Up</h3>
+            <p>Dear [Title Last Name],</p>
+            <p>Please find attached (1) a redline edit, which includes a draft of the article with the tracked changes made during the sourcecite; and (2) a clean version of the line edit, with the tracked changes accepted, and only substantive comments remaining.</p>
+            <p>The revised draft of your article is due one week from today on [Day], [Month Date]. Please make all edits to the draft in tracked changes. If applicable, please also send us a short summary of your piece, up to fifty words, by that date. Otherwise, we will display your existing abstract to preview your article on our webpage.</p>
+            <p>I am happy to touch base in any capacity between now and then as you work through the process of revising.</p>
+            <p>Best,<br>[Name]</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="guideModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('guideModal')">&times;</span>
+            
+            <h1 style="color: var(--yale-blue); margin-top: 0;">Guide to Drafting Edit Letters</h1>
+            
+            <p><em>This document draws from various Yale Law Journal guides.</em></p>
+            <p>This document should serve as your guide when drafting edit letters for authors. Edit letters should identify structural and analytical flaws that undermine the persuasiveness of a piece and propose solutions to address those defects. The Yale Journal of Law and Technology accepts a piece for publication because we feel that the author’s argument makes an important contribution to scholarly and popular discourse, and over the course of the editing process, the author and the editors work together to make the piece more impactful and persuasive.</p>
+            
+            <hr style="margin: 2rem 0; border: 0; border-top: 1px solid #ddd;">
+            
+            <h2>Guide Contents</h2>
+            <ul>
+                <li>I. Background on Edit Letters</li>
+                <li>II. The Components of an Edit Letter: Critical Analysis</li>
+                <li>III. Proposed Drafting Approach: First Edit Letter</li>
+                <li>IV. Proposed Drafting Approach: Second Letter and Line Edit</li>
+                <li>V. Sampling of Common Suggestions – Edit Letter</li>
+                <li>VI. Sampling of Common Suggestions – Line Edit</li>
+            </ul>
+            <h2>I. Background on Edit Letters</h2>
+            <p>The Yale Journal of Law and Technology typically sends authors two edit letters. The first edit letter, which responds to the first draft (the one submitted via Scholastica), attempts to identify the most serious and foundational flaws. You should think of this initial edit letter as the “big picture” letter. The first letter may ask an author to add a new part, rewrite a section of the piece, or significantly revise the organization. It is important to make these big suggestions early in the process while the author still has a lot of time to revise. As time passes and the article gets closer to publication, the universe of viable suggestions narrows. After receiving the first edit letter, the author will submit a revised draft.</p>
+            <p>The Yale Journal of Law and Technology will respond with a second edit letter as well as a first line edit. Generally, the second edit letter addresses slightly more granular criticisms than the first. You can think of the second edit letter as the “little details” letter. It may also identify new problems that arise in material that the author added during the revision. The first line edit addresses paragraph-level organizational issues—small analytical issues in a particular passage, unclear argumentation, slippage between paragraphs, signposting, or transition sentences. Your line edits can be a combination of comments and in-text edits made using track changes. When making direct edits, keep in mind that we want to preserve the author’s voice as much as possible. You should avoid making edits based on your personal style preferences. Instead, you should focus on objective issues and improvements.</p>
+            <p>Following the second edit letter, the author will submit their third draft. The third draft will be what goes through the sourcecite process. After the sourcecite, Article Editors will work with the Executive Editors to review and (if relevant) incorporate the sourcecite suggestions. Once compiled, the marked draft can be sent to the author to review and add or alter sources (as deemed necessary by the Article Editor and Executive Editors). This final version will go to the Executive Editors for bluebooking. The Executive Editors will then send their draft to the author for a final approval before publication.</p>
+            <p>Because the Yale Journal of Law and Technology offers multiple rounds of feedback, a key consideration throughout the process is how to prioritize suggestions. Specifically, at which stage of the process to provide various types of comments. Recall that the first edit letter should focus on the most significant flaws in the piece and those that will require the most work to resolve. In contrast, the second edit letter will feature smaller comments about prose and paragraph-level problems.</p>
+            <h2>II. The Components of an Edit Letter: Critical Analysis</h2>
+            <p>In the first edit letter, your task is to identify significant problems with the piece and propose constructive solutions. No piece is perfect, and there are often dozens of criticisms you could offer. Thus, the central challenge in writing an edit letter is to identify the problems that are most central to the author’s project.</p>
+            <p>A successful critical analysis works within the walls of the piece. In general, you should not need to perform outside research or utilize special expertise. The author is the expert on the subject, not you (or the intended audience!). The author should provide enough information for you to understand (1) how the article fits into the legal landscape, (2) why it is important, and (3) which literature it responds to. If you walk away from an article not understanding any one of those three things, the issue is not that you are not smart enough; the issue is with the way the material is being presented.</p>
+            <p>There are four key elements to any suggestion in a critical analysis:</p>
+            <ol>
+                <li>Begin with a one-sentence summary of the problem;</li>
+                <li>Next, offer a more detailed explanation of what the problem is and how it undermines the argument. This explanation will likely require several sentences and should offer a clear description of how the problem manifests or, to the extent possible, offer specific examples;</li>
+                <li>Once you have clearly set out the problem, identify a viable solution. An effective solution should be specific. Where relevant, you might also consider providing alternative suggestions;</li>
+                <li>Lastly, each suggestion should include a justification explaining why implementing the solution will strengthen the piece (for example, that the suggestion will help the author’s project, improve the article’s clarity, or help readers understand the author’s point). Giving multiple reasons, where appropriate, makes the suggestion more persuasive.</li>
+            </ol>
+            <h2>III. Proposed Drafting Approach: First Edit Letter</h2>
+            <p>There are many ways that you might approach the task of writing the first edit letter, but if you are looking for direction, below is a short description of one strategy. In general, try to keep your edit letter at around 1,000 to 1,500 words, but note that there is no set minimum or maximum length.</p>
+            
+            <h3>1. Read the Piece (Three to Four hours)</h3>
+            <p>Take a few hours to read through the piece. One approach is to start reading and annotating the article right away. Others find it helpful to read the piece twice; once to understand the main argument without being critical (some people deliberately choose not to annotate the piece or even underline during their initial read), and then, armed with a basic understanding of the argument, read through a second time to engage with the piece more critically. This approach is especially helpful if you are not as comfortable with legal scholarship, as it will give you a lay of the land before you start thinking about specific sections and critiques. When you get to marking up the piece, ask yourself the following types of questions: What is the piece trying to do in each section? What does the piece do well and what it does it do poorly? Which passages are unclear? Are there major gaps in the author’s logic? Are certain claims underdeveloped?</p>
+            
+            <h3>2. Outline the Argument (One to Two hours)</h3>
+            <p>Once you have marked up the piece, write a brief outline of the article’s argument. This will help you synthesize the piece’s analysis and see how its various parts work together. It is useful here to outline the article based on the author’s headings and sectional divisions. You want to make sure that you have noted down what the author is saying, exactly how they say it. That way, when you are done with this outline, you will be able to more clearly see where the flaws or gaps are.</p>
+            <p>When you finish outlining, spend a few minutes reflecting on the core contributions of the piece, its organizational structure, and any thematic elements. Most importantly, identify the author’s main objective in one to two sentences. Highlight this objective at the top of your outline.</p>
+            <h3>3. Brainstorm and Prioritize (Two to Three hours)</h3>
+            <p>Next, spend an hour or so reviewing your notes, reflecting on what you have read, and brainstorming potential revisions. Many people find it helpful to prepare bullet points of possible suggestions. Once you have put all of your ideas on paper, read through them to think about the relationship between your points. Do some of them cluster around a particular theme or issue that runs through multiple sections of the piece? If so, spend a few minutes reorganizing your points so that they are arranged thematically.</p>
+            <p>The next step is to winnow down your ideas. Given the importance of offering a robust explanation for each point, you may want to home in on four to five suggestions. There are no hard and fast rules; simply make sure that each point is appropriately developed.</p>
+            <p>As you prioritize your ideas, consider three factors. First, which critiques provide the greatest value? In other words, how much would each improve the piece? One way to assess the value of each idea is to “funnel” them through several levels of review. The biggest issues are generally fundamental problems with the author’s argument, which can arise from faulty or unsupported assumptions, logical gaps or inconsistencies in the analysis, and the failure to address potentially fatal counterarguments. Intermediate issues are often structural and occur when the author has not organized the piece in the most effective way. Smaller issues arise at the paragraph or sentence level and include problems with syntax and micro-level organizational flaws. When identifying the article’s greatest flaws, you should also consider the author’s intellectual project. An editor’s goal is to take the author’s intellectual objectives as a given and help the author make the most effective and persuasive argument possible. The author’s objectives should inform both the flaws you identify and your proposed solutions.</p>
+            <p>Second, for which critiques do you have a compelling solution? If you have a powerful critique but you do not know how to resolve it, then you should not include it in your edit letter.</p>
+            <p>Third, are your critiques an effective use of your word count? If it is going to take you eight hundred words to explain the problem and outline the solution, thereby limiting your ability to raise other points, you might consider focusing on more discrete points. You may not know until you start drafting, but do not be afraid to heavily edit—or even remove—some of your suggestions as you work on your edit letter. Deciding which suggestions to pursue is perhaps the hardest part of the edit letter, so it is worth taking the time to reflect carefully.</p>
+            <h3>4. Outline the Edit Letter (One to Two hours)</h3>
+            <p>After you have prioritized your suggestions and selected the ones you want to focus on, start developing a proper outline. As you do so, focus on the four elements that are key to any suggestion:</p>
+            <ol>
+                <li>Each suggestion should begin with a one-sentence summary of the problem. Your edit letter should provide an organizational heading at the start of each suggestion. But, even if you include a descriptive heading, it is still important to begin the paragraph with a one-sentence summary.</li>
+                <li>Next, offer a more detailed explanation of what the problem is and how it undermines the argument. This explanation will likely require several sentences. Be sure to identify which page or section of the piece your comment is directed at and offer a clear description of how the problem manifests or, to the extent possible, offer specific examples.</li>
+                <li>Once you have clearly set out the problem, identify a viable solution. Many people invest a lot of time in the critique, but the solution is an equally if not more important element of the edit letter. An effective solution should be specific. Do not simply tell the author to “clarify this point” or “reorganize this section”; advise the author as to how to go about clarifying the claim or outline an alternative organizational scheme. Where relevant, you might also consider providing suggestions in the alternative. Also, as you frame your suggestions, remember that reconfiguring the material the author has already developed is often a more productive avenue than asking the author to rewrite major sections of the article.</li>
+                <li>Lastly, each suggestion should include a justification explaining why implementing the solution will strengthen the piece. Justifications might be that the suggestion will help the author’s project, improve the article’s clarity, or help readers understand the author’s point. Giving multiple reasons, where appropriate, makes the suggestion more persuasive. Sometimes the solution and the justification will merge into one, or the justification will precede the solutions, but all four elements need to be addressed in roughly this order.</li>
+            </ol>
+            <p>As an aside, some people feel compelled to “sandwich” every criticism between compliments. This is not something the Yale Journal of Law and Technology encourages. Most authors are used to receiving constructive criticism, and there is no need to soften them up with a compliment. Do, however, use a polite and encouraging tone when offering your critiques.</p>
+            <h3>5. Write the First Draft (Five to Seven hours)</h3>
+            <p>Armed with your outline for the critical analysis, the next step is to write a first draft. It should be relatively easy to build on your outline, so at the writing stage, the focus should be on effective communication. The Yale Journal of Law and Technology favors clear and crisp writing. When in doubt, prioritize clarity over sophistication. Gratuitously using big words and complex syntax is more likely to harm than help.</p>
+            <p>As you write, be mindful of audience and tone. Your audience is the author of the piece. As such, your suggestions should address the author directly, and your voice should be both assertive and respectful. Criticisms should be phrased in a way that is constructive, not degrading, and suggestions should be phrased as requests rather than demands (“Consider revising this section” or “We suggest that you implement this change”). Note that editors write on behalf of the organization as a whole and thus we use “we” when making suggestions in our edit letters.</p>
+            <h3>6. Revise, Revise, Revise (Three to Four hours)</h3>
+            <p>Revision is the key to good academic writing. Thus, the final step is to read through your edit letter carefully several times to ensure the prose is clear, the edit letter is well signposted, and each claim is well organized. As you review, carefully consider whether each section includes the four elements identified above.</p>
+            <p>Once you have spent a few hours on substantive revisions, be sure to proofread with care. Use spellcheck, proofread a hard copy, read it out loud, and do your best to catch any obvious errors.</p>
+            <p>Before sharing your edit letter with the author, be sure to email it to your assigned Executive Editor for review (and copy the Editor in Chief). The Executive Editor and Editor in Chief will review your letter, potentially add new suggestions or revise your suggestions, and will anonymize the edit letter before sending it back to you. Once you have received a sign-off from the Executive Editor, they may email the letter to the authors. Be sure to copy your assigned Executive Editor and the Editor in Chief on your email.</p>
+            <p><strong>Executive Editors:</strong> To anonymize the edit letter, please go to the Review tab > Protect > Protect Document > check “Remove personal information from this file upon save.” You should then save the edit letter, which will anonymize all of the edits. Please then return to the “Protect” dialog box and uncheck “Remove personal information from this file upon save.”</p>
+            <h2>IV. Proposed Drafting Approach: Second Letter and Line Edit</h2>
+            <p>By the time you are writing your second edit letter, you will be familiar with the author’s argument. While you must still reread the piece to identify the changes that the author made in response to your first edit letter, you should not need to outline their argument again (unless one of your suggestions required a reworking of the argument, which it generally should not). As mentioned, your focus in the second edit letter will be on the finer areas of improvement, but if you feel that there are still larger issues with the draft, please reach out to your Executive Editor to get their thoughts on how to proceed. Otherwise, you will follow a similar approach as the first edit letter, this time with a focus on (1) minor high-level suggestions, (2) paragraph-level changes, and (3) sentence-level changes to the piece.</p>
+            <p>At a high level, consider whether there are any remaining overarching structural or substantive changes the author should make. The issues you flag here may have existed in the first iteration of the piece (and were not significant enough to flag in the first edit letter) or may have come to be as a result of revisions made based on the first edit letter. Your suggestions at this level will make up the bulk of your second edit letter. The rest will be explanations of your line edits, which will focus on paragraph-level and sentence-level changes.</p>
+            <p>On the paragraph level, consider whether the paragraphs and sentences are in the best order; whether the paragraphs are clearly introduced with topic sentences; and whether the paragraphs serve the goals of their sections. If you have to read a paragraph twice—either now or when you first read the piece—that is a problem: a reader is not going to give the article that level of attention. Suggest changes to make sure that each argument is clear on a quick read. Most paragraph-level issues should be accompanied by author comments either: a) explaining the change to the author; or, less preferably, b) suggesting that the author make the change.</p>
+            <p>On the sentence level, ensure that each sentence is short, active, and grammatical. Sentence-level changes are less likely to require an author comment.</p>
+            <p>After you make your changes, please turn Microsoft Word to “Simple Markup” and look through a clean version of the article. But do not to accept any changes yourself. We must not introduce errors into authors’ articles, and we must make sure that our authors are able to accept (or reject) all of our changes.</p>
+            <p>When working on a line edit, keep in mind that the experience of reading a line edit can be hard for authors if it seems like a line-by-line attack on their work. Accordingly, please try to use deferential language in the comment bubbles, employing phrases like “Please consider” or “We recommend.” Authors have the final say over these decisions and are more likely to accept our recommendations when they are written in the spirit of collaboration.</p>
+            <p>Finally, please make sure that all of our correspondences with authors remain professional. Comment bubbles should employ correct grammar and syntax. Comment bubbles should generally identify suggestions for “the Essay,” rather than telling an author “You should consider . . . ”</p>
+            <h3>Example of an Effective Suggestion</h3>
+            <p>Below is an annotated example of an effective part of an edit letter that contains the four elements identified above (summarize the problem; explain the problem; identify a solution; justify the suggestion).</p>
+            
+            <img src="pic1.png" alt="Annotated example of an effective edit letter">
+            <h2>V. Sampling of Common Suggestions – Edit Letter</h2>
+            <p>When selecting your suggestions, the central objective is to engage with the piece on its own terms: what is the author’s goal, what argument strategy have they adopted, and how can this strategy or the execution thereof be improved to better achieve the author’s objective? In light of this individualized exercise, there are no one-size-fits-all critiques or stock edit letters to draw upon. That said, certain categories of problems do tend to recur across pieces. Below is a list of some common issues that appear in edit letters. However, we emphasize that this list is meant to inspire, not to constrain. Some of the most important flaws in an article may not fit within these categories, so do not limit yourself to these categories.</p>
+            
+            <h3>Clarity of Argument</h3>
+            <ul>
+                <li><strong>Providing necessary context:</strong> Often authors are so deeply immersed in their work that they fail to appreciate the contextual gaps that may confuse a lay audience. For example, they might jump into a detailed doctrinal discussion of a case without explaining the facts and posture, or make a conceptual claim without providing an example.</li>
+                <li><strong>Identifying the piece’s contribution and implications:</strong> Some pieces are so focused on establishing their claim that they give short shrift to the “so what” question. In these instances, we encourage the author to highlight more explicitly the nature of their contribution and to identify the implications for law or policy.</li>
+                <li><strong>Situating it in the literature:</strong> Every piece enters into a series of pre-existing scholarly conversations. Although setting up the argument requires an author to distinguish their claims from previous scholarship and situate the piece within a field, some pieces fail to do so. In these situations, consider prompting the author to add a mini literature review and identify the work with which you think they should engage.</li>
+                <li><strong>Making the discussion more argumentative:</strong> Occasionally the organization of a piece will make it feel more like a treatise than an argument. Perhaps the author chronologically analyzes a series of cases or walks through a long list of empirical examples. One way to address this is to make sure that each example or case is introduced with an argumentative statement and to reorganize the examples thematically. This type of suggestion requires a bit more work and is usually introduced in the first edit letter.</li>
+            </ul>
+            <h3>Analytical Cohesion</h3>
+            <ul>
+                <li><strong>Justifying the focus or case studies:</strong> Most pieces will drill down on a subset of problems in a larger field. For example, a piece on discrimination might focus on discrimination based on gender, sexual orientation, or religion. Often, it is important for an author to justify why they have chosen to focus on a particular set of examples rather than others and explain why the examples chosen are representative and how, if at all, they may be anomalous.</li>
+                <li><strong>Explicating missing premises or presumptions:</strong> Sometimes, there will be analytical or conceptual gaps in an argument. For example, in one section an author might acknowledge that the Fourth Amendment does not protect foreign citizens, but in a prescriptive section argue that law enforcement should need a warrant for all electronic communications, irrespective of the nationality of the target. While these claims might appear inconsistent at first, they can be reconciled with two as yet unstated premises: 1) incidental collection of citizen communication is ubiquitous when targeting foreigners, and 2) incidental collection is arguably an infringement of Fourth Amendment rights. A good edit letter prompts the author to elucidate these premises.</li>
+            </ul>
+            <h3>Engagement with Critics</h3>
+            <ul>
+                <li><strong>Addressing countervailing literature:</strong> Sometimes an author will acknowledge counterarguments in existing literature but will do so cursorily or in a manner that fails to do justice to the force of the counterargument. It may be hard to identify these problems without outside context, but if these problems are evident, it can be very helpful to point out the oversight and help the author think about how to respond more persuasively.</li>
+                <li><strong>Identifying and responding to counterarguments:</strong> Counterarguments are a very common element of edit letters. However, you should approach this category of suggestions with caution. There are always a dozen clever rejoinders to a piece, but many of these are orthogonal to the actual argument. Usually, the number of counterarguments that fundamentally undermine the argument is quite limited, and these critiques may rely on a different set of first principles than those set forth by the author. Therefore, before you raise a counterargument in an edit letter, think carefully about whether it is actually fatal to the core claim or simply invites the author to engage in a tangential discussion.</li>
+                <li><strong>Proposing new extensions:</strong> Instead of raising a litany of potential counterarguments, a more helpful approach is often to help the author identify new extensions or implications for their work. Perhaps the author’s argument about privacy has important unexplored implications in the Fourth Amendment context. Pointing these out is more likely to be a genuine contribution to the author’s project.</li>
+            </ul>
+            <h3>The Payoff of the Argument</h3>
+            <ul>
+                <li><strong>Helping the author develop prescriptive recommendations:</strong> Frequently, authors spend a majority of their piece making bold claims about a legal problem, but then make cautious and cursory prescriptive recommendations. Therefore, many first edit letters emphasize that the prescriptive section is underdeveloped or needs to be more candid about the limiting principles that cabin an otherwise overbroad claim. For example, an article forcefully showed how conventional conceptions of a territorially bounded Fourth Amendment right break down in the digital age, but the proposed alternative was tepid. One aim of the edit letter was to help the author make this proposal more robust. These kinds of solutions are difficult to craft, but, as noted above, the editors and the author are engaged in a shared intellectual project and a good edit letter should give the author new and insightful suggestions about how to enrich their claim.</li>
+            </ul>
+            <h3>Organizational and Structural</h3>
+            <ul>
+                <li><strong>Reordering parts:</strong> Occasionally a piece will be organized sub-optimally and the cogency of the analysis can be improved by reordering certain parts or sections. This is a suggestion that the Yale Journal of Law and Technology makes relatively infrequently. There are usually a number of ways that an argument can be organized, and each scheme will offer only marginal advantages over alternatives. Instead, issues of analytical cohesion often stem more from elements that are internal to a section or part. In this sense, telling an author to reorder is a bit like re-arranging deck chairs on the Titanic. This is not to say that you cannot raise these reordering suggestions, but just know that in practice they are relatively rare.</li>
+                <li><strong>Dividing sections:</strong> A more common suggestion is to split a part or a section into multiple subparts. Sometimes two or more distinct arguments will be blended together as one or a section is so long that it becomes unwieldy for the reader. Here, inviting the author to disaggregate interwoven claims or insert new section headings can significantly improve the coherence of the argument. But again, rely on these types of critiques sparingly and only if you justify why the reordering or dividing of parts is critical to the author clearly communicating their novel contribution.</li>
+            </ul>
+            <h2>VI. Sampling of Common Suggestions – Line Edit</h2>
+            
+            <h3>I. The First Line Edit: Global Feedback</h3>
+            
+            <p><strong>A. Copy editing</strong></p>
+            <p>Our goal is to make each piece as smooth and clean as possible within the bounds of retaining the author’s voice. Unless a draft comes to us particularly well written and polished, your line edit should not be limited to changing objective errors, like grammar. You should also focus on improving the piece’s flow, clarity, and overall accessibility to readers.</p>
+            <p>Copy editing often entails significant rework, such as rephrasing substantial portions of sentences, suggesting deletions, suggesting text that should be moved into footnotes, and reordering sentences or paragraphs. If a sentence is in particularly bad shape, you can leave an author query instead of reworking it yourself; see Part III below for a sample.</p>
+            <p>Look for places where the author could be more concise. Some authors might have a natural tendency to repeat a point multiple times. It is our job to help the authors refine their argument not just substantively but also stylistically.</p>
+            
+            <p><strong>B. Objective errors in the main text</strong></p>
+            <p>During the First Line Edit, be especially watchful for objective errors in the main text. Common errors authors might introduce include (but are not limited to) the following:</p>
+            <ul>
+                <li><strong>Extra spaces:</strong> You can more easily spot extra spaces by pressing the “Show/hide paragraph” button. Searching for a blank space in your search bar may also help you identify extra spaces.</li>
+                <li><strong>Improperly formatted ellipses:</strong> Searching for ellipses in your search bar can help identify improperly formatted ones.</li>
+                <li><strong>Hyphenation errors</strong></li>
+                <li><strong>Capitalization errors:</strong> For example, in reference to the Supreme Court, “the court” should be “the Court” and “justices” should be “Justices”.</li>
+                <li><strong>Numeral errors:</strong> In general, numbers zero to ninety-nine should be spelled out. For example, “The unemployment rate dropped by 5 percent” should be “The unemployment rate dropped by five percent.”</li>
+                <li><strong>“Part” and “Section” errors:</strong> Main sections (for example, Roman Numeral One, Roman Numeral Two) are “Parts.” Any subdivisions within Parts are “Sections.” Example error: “In Part II.B, I argue” should be “In Section II.B, I argue.”</li>
+            </ul>
+            <p><strong>C. Global comment</strong></p>
+            <p>Please leave a comment at the top of the document thanking the author for the draft and flagging any important global suggestions we have. See Part III below for a sample.</p>
+            <p><strong>D. Missing roadmap</strong></p>
+            <p>First drafts may omit the “roadmap” that we typically include at the end of the Introduction. In such cases, please leave an author query recommending one. See Part III below for a sample.</p>
+            <p><strong>E. Missing citations</strong></p>
+            <p>Drafts may omit citations in instances where support is required. In such cases, please leave an author query asking the author to add a citation to support their claim. See Part III below for a sample. The advantage to requesting all citations at this stage is that we can guarantee that every footnote (in its complete form) is subject to our sourceciting process.</p>
+            <h3>II. The Second Line Edit: Global Feedback</h3>
+            <p>The suggestions outlined in Part I apply to the Second Line Edit as well. At this stage, please additionally keep in mind the below points.</p>
+            
+            <p><strong>A. Bluebooking</strong></p>
+            <p>During a Second Line Edit, the piece you are editing will have been sourcecited. While you do not need to check the underlying sources for accuracy for the purposes of your line edit, please check each footnote for proper Bluebooking and style.</p>
+            <p><strong>B. Author responses</strong></p>
+            <p>The author may have responded to the queries we left in the First Line Edit. If so, please respond with an author query. This can be as simple as “Thank you!” if no specific answer is needed. If the author has addressed and resolved a query we left in the First Line Edit, you may delete the resolved comment from the document if you wish.</p>
+            <h3>III. Sample Author Queries</h3>
+            <p>This Part contains several sample queries that you may use in your line edits, if helpful. Please be sure to customize the bracketed fields based on the context.</p>
+            <p><strong>A. Global comment</strong></p>
+            <ul>
+                <li>Author: We greatly enjoyed reading this draft! We have included some suggestions throughout.</li>
+                <li>Author: We greatly enjoyed reading this draft! We have included some suggestions throughout. Additionally, we would like to flag a few high-level comments up top: [Insert comments here].</li>
+                <li>Author: Thank you so much for this excellent and thought-provoking draft. We greatly enjoyed reading it. As a general matter, please add citations whenever you make factual assertions or refer to existing work. We have flagged instances of this, but we encourage you to add more thorough citations throughout. Relatedly, as you fill in the footnotes, it would greatly aid our editing process if you could make a first attempt at formatting your citations according to the Bluebook. Our team of editors will find it extremely helpful.</li>
+            </ul>
+            <p><strong>B. Roadmap comment</strong></p>
+            <ul>
+                <li>Author: We recommend adding a roadmap to your Introduction that foreshadows each Part of your Essay. For example, “In Part I, I describe . . . . In Part II, I argue . . . . Finally, in Part III, I propose . . . .”</li>
+            </ul>
+            <p><strong>C. Miscellaneous</strong></p>
+            <ul>
+                <li>Author: Please include a citation to support this proposition.</li>
+                <li>Author: We recommend rephrasing this sentence for clarity.</li>
+                <li>Author: We recommend adding another [sentence/phrase/paragraph] to clarify [confusing thing].</li>
+                <li>Author: We recommend moving this portion into a footnote or omitting it.</li>
+                <li>Author: We recommend condensing this [paragraph/point/Section/Part] to [suggested length].</li>
+                <li>Author: We recommend further developing this [paragraph/point/Section/Part]. In particular, we believe it would be helpful to [explain what needs further development].</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="preemptionGuideModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('preemptionGuideModal')">&times;</span>
+            <h1 style="color: var(--yale-blue); margin-top: 0;">Guide to Conducting a Preemption Check</h1>
+            <p>A preemption check is a crucial step in the editorial selection process. It determines whether a submitted article's central arguments have already been published in existing legal scholarship. </p>
+            
+            <hr style="margin: 2rem 0; border: 0; border-top: 1px solid #ddd;">
+
+            <h2>Step 1: Assign a Preemption Level</h2>
+            <p>Begin your evaluation by keeping a standardized grading scale in mind. After reviewing the piece and the existing literature, you will assign one of the following preemption levels to the submission:</p>
+            <ul>
+                <li><strong>Complete:</strong> An essentially identical piece already exists.</li>
+                <li><strong>High:</strong> The argument has been substantially made and fleshed out elsewhere; the piece is distinguished primarily in its ancillary discussion and/or execution.</li>
+                <li><strong>Moderate:</strong> Parts of the argument have been made in a piecemeal fashion across other works, but the particular execution of the piece still allows for a significant and original contribution.</li>
+                <li><strong>Low:</strong> The argument has been alluded to (e.g., in passing or in footnotes) in existing literature, but has never been fully fleshed out.</li>
+                <li><strong>None:</strong> The article makes a completely novel argument and will be the foundation of its field.</li>
+            </ul>
+
+            <h2>Step 2: Draft the Executive Summary</h2>
+            <p>Your memo should open with a high-level summary that provides the assigned preemption level and a brief justification.</p>
+            <ul>
+                <li><strong>Identify Themes:</strong> Note the overarching themes of the submission (e.g., "territorial exceptionalism," "status manipulation").</li>
+                <li><strong>Assess Field Saturation:</strong> Briefly state whether the general field of scholarship surrounding the topic is saturated or emerging.</li>
+                <li><strong>Highlight Unique Arguments:</strong> Isolate the specific claims the author is making that set the piece apart (e.g., arguing that overturning a specific set of cases won't end the underlying harms).</li>
+                <li><strong>Final Verdict:</strong> Conclude whether the piece makes a foundational, moderate, or negligible contribution to the field based on how heavily it borrows from established frameworks.</li>
+            </ul>
+
+            <h2>Step 3: Conduct an Internal Preemption Check</h2>
+            <p>Internal preemption evaluates whether the author's own foundational sources have already made the argument the author is trying to claim as novel.</p>
+            <ul>
+                <li><strong>Review Cited Authorities:</strong> Look at the major articles, books, and essays the author relies on to build their argument.</li>
+                <li><strong>Compare Scope and Depth:</strong> Read the cited works to see if their scope overlaps too heavily with the submission. For example, if the author cites a broad piece on "Adjudication Outside Article III," verify whether that cited piece already dedicates significant depth to the specific sub-topic (e.g., territorial courts) the author is writing about.</li>
+                <li><strong>Check for Distinction:</strong> Document whether the cited works focus on entirely different contexts (e.g., military or bankruptcy courts) or if the current author is simply building upon a framework rather than repeating it. List the key citations and your brief findings for each.</li>
+            </ul>
+
+            <h2>Step 4: Conduct an External Preemption Check</h2>
+            <p>External preemption evaluates whether the broader universe of legal scholarship—outside of what the author explicitly cited—has already made the author's arguments.</p>
+            <ul>
+                <li><strong>Deconstruct the Author's Claims:</strong> Break the submission down into its main analytical points.</li>
+                <li><strong>Search for Overlap:</strong> Conduct independent research (using legal databases like HeinOnline, Westlaw, or Google Scholar) to find existing literature that addresses those specific points.</li>
+                <li><strong>Evaluate Nuance:</strong> If you find articles discussing the same general problem, determine if the <em>angle</em> is identical. For instance, if existing works argue that a set of cases <em>should</em> be overruled, but the current submission argues <em>how</em> they should be overruled or the <em>dangers</em> of overruling them too quickly, note that distinction as an original contribution.</li>
+                <li><strong>Identify Piecemeal Preemption:</strong> Look for scholarship that makes similar analytical links, even if in a different context. If the author argues that a specific legal doctrine unexpectedly maximizes local self-determination, search to see if other scholars have already observed this irony. Note these findings, even if they only appear in footnotes or loosely related articles, to determine if the author is truly charting new territory.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="preemptionMemoModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('preemptionMemoModal')">&times;</span>
+            <h1 style="color: var(--yale-blue); margin-top: 0;">Sample Preemption Check Memo</h1>
+            <h2>Aurelius’s Article III Revisionism: Reimagining Judicial Interventions for the Insular Cases</h2>
+            <p><strong>Preemption level<sup>1</sup>:</strong> Low-Moderate</p>
+            <p><strong>Summary</strong><br>
+            Some concerns, but nothing very serious. Many of the themes the author discusses (e.g., territorial exceptionalism, status manipulation) are already explored, and in general, the field of scholarship on Aurelius and the Insular Cases is quite saturated. That said, the author makes some (relatively) unique arguments—specifically, that overturning the Insular Cases would not spell an end to their harms and that calls for judicial overthrow should consider delicate legal interests surrounding self-determination and self-government which have developed around the Insular Cases doctrine.</p>
+            <p>In sum, this submission would make a moderately original contribution to the law of the territories, but it borrows from established normative and descriptive frameworks and it would not be foundational to its field.</p>
+            
+            <h3>Internal Preemption</h3>
+            <p>The scholarship that the author relies on (e.g., the literature it cites on Article III exceptions, status manipulation, and the Insular Cases) does not directly preempt its argument. Below, I list some of the relevant sources it cites for support.</p>
+            <ul>
+                <li>Will Baude, Adjudication Outside Article III, 133 HARV. L. REV. 1511 (2020).
+                    <ul><li>Baude’s article is of broader scope, discussing territorial courts as one of many examples of adjudication outside Article III (hence the title). It does not treat the territories with the same depth as this submission.</li></ul>
+                </li>
+                <li>Stephen I. Vladeck, Military Courts and Article III, 103 GEO. L.J. 933, 969-1000 (2015).
+                    <ul><li>Vladeck’s article focuses on military courts, so it is distinct from the focus of this submission.</li></ul>
+                </li>
+                <li>Erwin Chemerinsky, Formalism Without a Foundation: Stern v. Marshall, 2011 SUP. CT. REV. 183.
+                    <ul><li>Chemerinsky’s article focuses on bankruptcy courts, so it is distinct from the focus of this submission.</li></ul>
+                </li>
+                <li>Aziz Rana, How We Study the Constitution, Rethinking the Insular Cases and Modern American Empire, 130 YALE L.J.F. 312, 314 (2020).
+                    <ul><li>Rana’s essay does not preempt this submission. The author builds on this literature.</li></ul>
+                </li>
+                <li>Sam Erman, Truer U.S. History: Race, Borders, and Status Manipulation, How to Hide an Empire: A History of the Greater United States by Daniel Immerwahr, Farrar, Straus & Giroux, 2019, 130 YALE L.J. 1188 (2021).
+                    <ul><li>Erman’s book review does not preempt this submission. The author builds on this literature.</li></ul>
+                </li>
+            </ul>
+
+            <h3>External Preemption</h3>
+            <p>The author’s project on reimagining judicial interventions for the Insular Cases raises minor external preemption concerns, though nothing serious.</p>
+            <p>Their reimagining consists of two main analytical points. First, that “the core constitutional problems of territorial exceptionalism and status manipulation run deeper than the specific doctrinal framework of the Insular Cases, whose judicial overthrow would not necessarily spell an end to the harms of the legal order they represent.” The constitutional problems of territorial exceptionalism and status manipulation have already been canvassed. See, e.g., Sam Erman, Truer U.S. History: Race, Borders, and Status Manipulation, How to Hide an Empire: A History of the Greater United States by Daniel Immerwahr, Farrar, Straus & Giroux, 2019, 130 YALE L.J. 1188 (2021); Andrew Hammond, Territorial Exceptionalism and the American Welfare State, 119 MICH. L. REV. 1639 (2021). Thus, the author’s descriptive account of these problems is not novel, and it largely borrows points from existing literature. Likewise, as noted above, there is abundant scholarship on Aurelius and the Insular Cases. See, e.g., The Insular Cases in Light of Aurelius, YALE L.J.F. (Nov. 2, 2020), https://www.yalelawjournal.org/collection/the-insular-casesin-light-of-aurelius. But in contending that the problems of status manipulation and territorial exceptionalism “run deeper than the specific doctrinal framework of the Insular Cases,” the author forwards a relatively original argument. Most works on Aurelius and the Insular Cases focus on how the Insular Cases need to be (and should have been) overruled. As the author correctly describes, “calls for judicial intervention concerning the Insular Cases redirect their focus to the many historical and doctrinal parallels between the Insular Cases and other anticanonical cases that have been overturned—namely Plessy, and now, Korematsu.” See, e.g., Neil Weare, Why the Insular Cases Must Become the Next Plessy, HARV. L. REV. BLOG (Mar. 28, 2018), https://blog.harvardlawreview.org/why-the-insular-cases-must-become-the-next-plessy. The author argues that these scholarly calls must be “carried to their next logical station,” which this submission attempts to accomplish. Therefore, from what I could find, the author’s argument seems to be relatively unique, even if the underlying themes it borrows from are not.</p>
+            <p>The author’s other main point on judicial interventions is that “a blind leap from [the Insular Cases] framework carries the very real risk of flattening a path-dependent framework of indigenous rights and long-running processes of political self-determination and self-government across these islands.” This raises more preemption concerns. The author briefly cites to Russell Rennie, Note, A Qualified Defense of the Insular Cases, 92 N.Y.U. L. REV. 1683 (2017). Unlike the scholarship I discuss in the Internal Preemption section above, the author does not rely on this note for support, but rather cites it as a “But see” for the proposition that no viable defense of the Insular Cases exists. And indeed, for the most part, Rennie’s stance on the Insular Cases and the scope of its discussion (particularly as a pre-Aurelius piece) is distinct from the author’s. But Rennie’s note reveals that the author’s argument about legal interests surrounding self-determination and self-government is not so novel: the note argues that the Insular Cases have had the effect of “maximizing local self-determination,” id. at 1706 (typeface altered), and “enable[ing] local peoples to govern themselves as they desire,” id. at 1683. I encountered a fair amount of additional scholarship likewise acknowledging (if not always endorsing) this analytical link between the Insular Cases/territorial incorporation and the development of self-determination/self-government legal interests:</p>
+            <ul>
+                <li>Christina Duffy Burnett, Untied States: American Expansion and Territorial Deannexation, 72 U. CHI. L. REV. 797, 874-75 (2005) (“[S]ome scholars have argued that . . . the doctrine of territorial incorporation can promote self-determination instead of imperialism. As T. Alexander Aleinikoff puts it, ‘The infamous Insular Cases recognized the need for congressional flexibility in handling the unanticipated situation of Empire. When that flexibility is now, by mutual consent of metropole and colony, exercised to restore dignity and self-government, why should congressional power suddenly be read narrowly?’”).</li>
+                <li>Joseph E. Horey, The Right of Self-Government in the Commonwealth of the Northern Mariana Islands, 4 ASIAN-PAC. L. & POL’Y J. 180, 245 (2003) (“It is one of the ironies of history that, while the intent of the Insular Cases was to provide flexibility for future imperial expansion . . . their effect in the CNMI has been to provide flexibility in the establishment of an autonomous island government.”).</li>
+                <li>Javier J. Rúa Jovet, The Fourth Option: Modern Self-Determination of Peoples and the Possibilities of U.S. Federalism, 49 REV. DER P.R. 163, 189 n.50 (2010) (“Ironically, the [non] incorporation doctrine which originally legitimated popular desire to fulfil America's manifest destiny now provides the theoretical basis for assuring a large measure of territorial self-determination.” (quoting STANLEY K. LAUGHLIN, Jr., THE LAW OF UNITED STATES TERRITORIES AND AFFILIATED JURISDICTIONS § 10:10, at 181 (Law Co-op 1995)).</li>
+                <li>Susan K. Serrano, Elevating the Perspectives of U.S. Territorial Peoples: Why the Insular Cases Should Be Taught in Law School, 21 J. GENDER RACE &JUST. 395, 428 (2018) (discussing indigenous peoples’ “strategic employment of the Insular Cases to preserve a measure of self-determination”).</li>
+            </ul>
+            <p>Granted, these works do not explicitly intervene in the Aurelius/Insular Cases discussion. But given that the author’s self-determination/self-government argument seems somewhat underdeveloped (a non-preemption-related quibble I have with the piece), it’s difficult to say with confidence that the author really charts new territory.</p>
+            
+            <hr style="margin: 2rem 0; border: 0; border-top: 1px solid #ddd;">
+            <p style="font-size: 0.85rem;"><sup>1</sup> <strong>Key:</strong><br>
+            • Complete = essentially identical piece exists<br>
+            • High = argument has been substantially made and fleshed out; piece is distinguished primarily in ancillary discussion and/or execution<br>
+            • Moderate = Parts of the argument have been made in a piecemeal fashion, but the particular execution of the piece still allows for a significant contribution<br>
+            • Low = argument has been alluded to (e.g., in footnotes or passing) but never fleshed out<br>
+            • None = this article will be the foundation of the field</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="sampleLettersModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('sampleLettersModal')">&times;</span>
+            <h1 style="color: var(--yale-blue); margin-top: 0;">Sample Edit Letters</h1>
+            
+            <h2>Letter 1</h2>
+            <p><strong>I. Consider situating your Article in an existing scholarly debate.</strong><br>
+            You provide a comprehensive overview of the evolution of the reproductive justice (RJ) movement, the trajectory of reproductive rights post Roe, and the role of stare decisis in judicial decision-making. But you do not situate your argument about the implications of Justice Thomas’s Box concurrence in an existing scholarly debate. Without this additional context, some readers may be left wondering whether—or to what extent—your contribution is unique.</p>
+            <p>We recommend that you clarify the relationship between your Article and existing scholarship by adding a literature review to your Introduction. That literature review should establish whether you are the first to analyze the Box concurrence. It should also explain how other scholars, as opposed to the activists and litigants featured in Section II.A, have evaluated arguments equating abortion rights with state-sponsored racial genocide. In the event that you are both the first to analyze the Box concurrence and the first to evaluate arguments equating abortion rights with state-sponsored racial genocide, your literature review should connect your argument to existing conversations surrounding abortion rights generally. You could create this literature review by discussing various works that you already cite in your Article (e.g., footnotes 18 and 26), as well as any additional academic sources that Justice Thomas may have cited in his concurrence. By explicitly engaging with existing scholarship, you will ensure that your readers are able to fully appreciate the uniqueness of your argument.</p>
+
+            <p><strong>II. Consider strengthening your claim that the Box concurrence has “gained traction.”</strong><br>
+            You argue that Justice Thomas’s reasoning has “gained traction” in the lower federal courts (19). But you offer only three case examples, none of which adopt Justice Thomas’s approach. Instead, all three cases merely highlight the open question that Justice Thomas raised (19-21). And, as you point out, all three cases involve trait-selection statutes centered on disability, rather than race (21). Given that Box is almost two years old, the lack of caselaw adopting Justice Thomas’s concurrence seems to suggest that it has not, in fact, “gained traction.” Some readers may thus question your central claim that the Box concurrence is poised to undermine the Supreme Court’s precedents regarding reproductive rights and racial discrimination.</p>
+            <p>To address this concern, you could consider three approaches. First, you could identify and discuss more case examples. If you are unable to find more examples in the lower federal courts, you could identify and discuss state court cases. Second, if no such cases exist, you could identify and discuss concurrences that have shaped legal doctrines after periods of dormancy and compare them to Justice Thomas’s Box concurrence. Third, you could explicitly acknowledge that Justice Thomas’s rationale has not “gained traction” yet, but stress its potential to shape abortion caselaw in the years to come. By adopting one or more of these approaches, you would either bolster your central claim or state its stakes in more realistic terms.</p>
+
+            <p><strong>III. Consider reorganizing your argument.</strong><br>
+            Your discussion of the Box concurrence is central to your argument. But its placement does not reflect its importance. In your current draft, Part I and Section II.A discuss the RJ movement. Section II.B evaluates the Box concurrence. And Parts III and IV discuss the implications that the Box concurrence may have on reproductive rights and anti-discrimination law. This organizational structure buries your discussion of the Box concurrence beneath your discussion of the RJ movement, and obscures the distinction between the first and second steps in your argument.</p>
+            <p>We recommend that you reorganize your argument as follows. Part I and Section II.A. would be consolidated into a new Part I,<sup>1</sup> which would provide the historical background needed to understand the Box concurrence. Section II.B would become Part II, which would introduce and discuss the Box concurrence, as well as the various lower federal court opinions that refer to it. Parts III and IV would discuss the implications of the Box concurrence as they currently do. Reorganizing your existing sections into these parts would ensure that your discussion of the Box concurrence receives the attention it requires—and that your readers are able to follow each step of your argument with ease.</p>
+            
+            <p><strong>IV. Consider concluding with prescriptive claims.</strong><br>
+            Your criticisms of Justice Thomas’s reliance on “misleading and incomplete history” make clear that you disagree with his characterization of abortion rights and are concerned about the future implications of his Box concurrence (1). But your Article offers little, if any, guidance as to how those implications should be addressed. This limits your Article’s potential impact.</p>
+            <p>We recommend that you conclude your Article with a series of prescriptive claims directed towards judges, lawyers, legislators, and healthcare providers. In developing your recommendations for each group, you could draw on material that already appears in your Article. For example, in developing your recommendation for judges, you might consider the reasoning of the opinions that rejected Justice Thomas’s rationale in the cases you discuss in Section II.B (19-21). In developing your recommendation for lawyers, you might draw on the litigation strategies used in those same cases (19-21) or in the cases you refer to in Section II.A (14). In developing your recommendation for legislators, you might analyze the trait-selection statutes you refer to in Section II.A (14). And in developing your recommendation for healthcare providers, you might begin by reflecting on Planned Parenthood’s recent decision to remove Margaret Sanger’s name from its Manhattan Health Center, which you discuss in your Conclusion (50-51).<sup>2</sup> Including these recommendations would further clarify your normative position and serve as a valuable addition to your scholarly contribution.</p>
+            <p><em>Word Count: 991</em></p>
+            <p style="font-size: 0.85rem;"><sup>1</sup> Your new Part I could preserve the distinction you currently draw between Part I (“The Emergence of the Reproductive Justice Movement”) and Section II.A (“Racial Justice and Abortion Rights”) by organizing its newly consolidated text under two subheadings.<br>
+            <sup>2</sup> You might ask whether Planned Parenthood’s decision to remove her name legitimizes the Box concurrence or protects healthcare providers from its potential implications.</p>
+
+            <hr style="margin: 2rem 0; border: 0; border-top: 1px solid #ddd;">
+            
+            <h2>Letter 2</h2>
+            <p><strong>I. Consider bolstering your argument that the Box concurrence poses an existential threat to Roe.</strong><br>
+            The piece sounds the alarm about Justice Thomas’s Box concurrence as “plant[ing] the seeds for a potentially more successful strategy” (3) that could lead to the Supreme Court “eviscerating Roe” (39). You persuasively demonstrate that the logic of the Box concurrence provides one plausible avenue for overturning Roe. But without also demonstrating a strong possibility that a Court majority is willing to adopt this logic, we worry that the piece provides a rebuttal to a problem that does not yet exist and is unlikely to materialize.</p>
+            <p>A number of observations in the piece fuel this concern; chief among them is the fact that “no other member of the Court joined Justice Thomas’s concurrence” (2). Moreover, in all of the lower court decisions (and briefs) in which it makes an appearance, the Box concurrence argument does not ultimately prevail (19-21). Finally, the Article points out that the Court has a “long-standing record of sequestering its discussions of abortion from discussions of race and inequality”(42). Even as advocates and Justice Thomas attempt to co-opt the framework of reproductive justice, the Supreme Court has not. Without showing that the Court could plausibly adopt this specific approach, the Article reads as a response to Justice Thomas’s idiosyncratic views.</p>
+            <p>First, to emphasize the stakes of the Article’s argument, we encourage you to more directly address the likelihood of the Court adopting Justice Thomas’s argument. Consider providing an explanation for why no other Justices joined the Box concurrence. Are there reasons to believe that, given a different set of facts, other members of the Court would vote differently?</p>
+            <p>Second, we encourage you to highlight your account of the non-juricentric stakes of Justice Thomas’s Box concurrence. As the Article implies, beyond raising the possibility of overturning Roe, the Thomas concurrence is indicative of a broader co-option of the RJ framework by the anti-abortion movement. To underscore the importance of your argument, expand your discussion of the deleterious impact that Justice Thomas’s argument and the selective historical claims it relies on have had to the goals of the RJ movement in the public eye.</p>
+
+            <p><strong>II. Consider responding to objections that stare decisis is not a serious obstacle to overruling Roe.</strong><br>
+            The stakes of your argument also rest on the assumption that the Court needs a novel “special justification” to circumvent stare decisis in order to overrule Roe (26). And that Justice Thomas’s argument in his Box concurrence is the magic bullet that will finally allow the Court to overcome the stare decisis hurdle. But this assumption is vulnerable to a number of related objections that we recommend you address directly.</p>
+            <p>First, realist critics may argue that in light of recent conservative additions to the Court, it actually is “enough simply to cobble together a majority of five who believe Roe was wrongly decided” (26). Given the many other avenues available for overruling Roe, the Court has no need for the Box concurrence argument. Second, critics may argue that directly overruling Roe is not even necessary for eviscerating constitutional protection for abortion rights. Instead, the popular argument goes, Roe will face death by a thousand cuts. This indirect approach has the advantage of avoiding the stare decisis problem altogether.</p>
+            <p>We suggest you address these objections in Section III.A by surveying some of the other plausible ways that the Court may go about eviscerating Roe, and comparing them to the Box concurrence route your Article describes. We also encourage you to strengthen your claim that “stare decisis is . . . the reason why Roe cannot be overturned” (26) by directly addressing these objections.</p>
+
+            <p><strong>III. Consider differentiating the types of racial equity-based argument advanced by the Box concurrence.</strong><br>
+            We encourage you to more clearly differentiate the various strands of argument in Justice Thomas’s Box opinion as they relate to the Article’s central claims. The Article’s summary of Justice Thomas’s decision suggests that the Box concurrence advances a single line of argument “linking abortion to eugenic racism” (18). But throughout the Article, you associate at least three analytically distinct strands of racial equity-based argument with the Box concurrence:</p>
+            <ol>
+                <li>Racist Origins: The abortion and reproductive rights movement has its origins in a racist and eugenicist ideology (18).</li>
+                <li>Anti-Discrimination: Trait-selection laws are “anti-discrimination laws for fetuses” that protect a state’s interest in combatting racial discrimination (18).</li>
+                <li>Disparate Impact: Abortion has a disparate impact on people of color (47).</li>
+            </ol>
+            <p>Depending on the Article section, different strands of the Box concurrence are at issue. For example, Section IV.B, which argues that the Box approach is inconsistent with Justice Thomas’s commitment to color-blind constitutionalism, focuses entirely on Thomas’s reference in Box to “the disproportionate incidence of abortion within the Black community” (47) the disparate impact argument. Meanwhile, Section III.C & D relating Ramos to Box focus entirely on the racist origins claim, explaining that decisions “infected by racial animus” are not bound by stare decisis.</p>
+            <p>This gives rise to two potential concerns. First, from the reader’s perspective, it becomes unclear which exact racial harm Justice Thomas’s Box concurrence is asserting. And second, critics may allege that the Article selectively switches between different parts of the Thomas concurrence to support different conclusions, in the process conflating analytically distinct racial harms.</p>
+            <p>We encourage you to provide a more careful reconstruction of Justice Thomas’s Box concurrence in Section II.B. Lay out and distinguish the different types of racial harm that Justice Thomas associates with abortion early on. On your reading of his opinion, are these claims different strands of a single racial equity-based argument, or are they different arguments altogether with a shared end? Finally, we suggest that you clarify which strands of argument are most important for purposes of the Article’s central theses. For instance, which claims pose the most serious threat to Roe? Which claims pose the most serious threat to the RJ movement? And which claims pose the most serious threat to “the broader project of racial justice?” (44).</p>
+            <p><em>Word Count: 999 Words</em></p>
+
+            <hr style="margin: 2rem 0; border: 0; border-top: 1px solid #ddd;">
+
+            <h2>Letter 3</h2>
+            <p><strong>A. Consider addressing arguments that Ramos v. Louisiana's circumstances are easily distinguishable from abortion, and thus is not an example of how Roe is threatened by the Box concurrence's logic.</strong><br>
+            We encourage you to address arguments that Ramos v. Louisiana's circumstances could be easily distinguished from abortion by courts, as that means the Box concurrence's logic does not pose a significant threat to abortion and this piece's singular focus on one Justice's concurrence is unnecessary. In Part III, you argue how the concurrence "lays a foundation for undermining, and eventually overruling Roe v. Wade" (22). You explain how the Court has overturned precedent when there is an "interest in correcting racial wrongs" (e.g., in Brown v. Board of Education) (31). You acknowledge how these examples may not connect perfectly to abortion now as they either involve "facial racial classifications" or are older cases (Id.).</p>
+            <p>However, Section III.C examines one modern case, Ramos v. Louisiana - which did not involve facial racial classifications but that overruled precedent - to argue that the Box concurrence truly threatens abortion. But one could argue that Ramos's context is too different from abortion to be relevant. For example, in Ramos, the Court held that the challenged non-unanimous jury rule was created specifically to "ensure that African-American juror service would be meaningless," which tipped the balance in overturning precedent (34). However, with abortion, Margaret Sanger's racial views may not have directly motivated policymakers or judges who ultimately expanded abortion access nationwide. This situation differs from Ramos when the Court highlighted that the only two states with these rules were specifically motivated by race. As such, Ramos may not point to abortion truly being threatened even with the Box concurrence as the comparison is easily rebuttable.</p>
+            <p>It is important to defend this comparison as Ramos is your primary modern example that signals that the Court could use the Box concurrence's logic to undermine abortion. For example, you can directly acknowledge that Ramos's context is different but that this concern is irrelevant as the crucial consideration is race serving as a "tipping point" (38). Thus, the fact that purported racist origins exist for a debated, "unenumerated right[]" like abortion means that Roe is still in danger and this piece's focus on this subject is justified.</p>
+
+            <p><strong>B. Consider emphasizing earlier in the piece how race only needs to be the "tipping point" to potentially overrule Roe, so that readers better understand the Box concurrence's potential consequences.</strong><br>
+            We encourage you to emphasize earlier in your piece how race is not likely to be the sole reason that abortion rights are overturned, but rather serve as a "tipping point," as that will help your readers better understand the Box concurrence's consequences. In your introduction, you explain how the concurrence "provides a roadmap ... to challenge Roe" as race will be the "special justification" needed to overturn abortion precedent (3). You signpost your argument's progression, with Parts I and II laying out "a contextual foundation," Part III explaining how stare decisis has protected Roe but that the Box concurrence's focus on race threatens Roe, and Part IV contemplating "the broader implications" (4-5).</p>
+            <p>Readers may better understand your piece's progression to and in Part III by highlighting earlier how "race need not ... be the reason for overruling Roe" but can serve "as the crucial element-the tipping point-that shifts the balance toward overruling" when "concerns [exist] about unenumerated rights and the workability of abortion doctrine" (38). If readers knew this more nuanced possibility of how the Box concurrence's logic could be used to overturn Roe earlier in the piece, they may be less likely to initially question the relevance and applicability of your examples of the Court overruling precedent because of explicitly facial racial classifications (e.g., Loving v. Virginia). You acknowledge that "it is unclear whether concerns about race, by themselves, would be enough to render Roe ripe for overruling" (Id.). You should provide readers this clarity earlier in the introduction that race only needs to be a contributing factor to undermine abortion. For example, when explaining your piece's structure in the introduction, you could add a line before previewing Part IV that explains how Part III will show that Ramos is instructive in demonstrating that race only needs to be a "tipping point." Clearly signposting the nuance of the argument will help readers better follow your piece's progression and understand the Box concurrence's significant consequences.</p>
+
+            <p><strong>C. Consider making explicit the connections between your arguments that are supported by citations but left unexplained in the text, as that would increase readers' understanding of how certain points build on one another.</strong><br>
+            We encourage you to make explicit the connections between your arguments that are supported by citations but left unexplained in the text, as that would increase the ease that readers have in following certain points' progression. For example, in Part I, you explain the reproductive justice movement's emergence and how Roe "resolved the conflict [around abortion] by resorting to the constitutional discourse of negative rights" (6). However, your main paragraph on page 6 that explains this point, which cites scholars like Robin West and Mary Ziegler, can be difficult to fully understand as the connections between points are not explicitly mentioned in the text (Id.). You reference West that "rights and rights rhetoric ... discredit[] precisely the democratic, popular, majoritarian, and political deliberation and reform it would take to upend them" (Id.). But your text leaves unexplained how precisely rights and their rhetoric discredit deliberation and reform. While readers could reference the source, it would be useful to explicitly explain this connection in an added sentence, as you then further build on this discussion by expanding on how courts' work is centered by "rights," which "feed[] a distrust of ... public deliberation" (Id.). Without explicitly explaining how rights discredit deliberation, the paragraph's progression can be confusing. Making explicit these connections between arguments will help readers better see how your points build on one another.</p>
+            <p><em>Word Count: 999</em></p>
+        </div>
+    </div>
+    <script>
+        // Logic for opening and closing accordion sections
+        document.querySelectorAll('.node').forEach(node => {
+            node.addEventListener('click', function(event) {
+                if (event.target.tagName.toLowerCase() === 'a') {
+                    return; 
+                }
+                this.classList.toggle('expanded');
+            });
+        });
+        // Universal logic for handling multiple Pop-up Modals
+        function openModal(event, modalId) {
+            event.preventDefault(); // Prevents page jumping
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+        // Close any open modal if the user clicks anywhere outside of the white box
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
